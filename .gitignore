@@ -2,8 +2,7 @@ ansible/secret
 secret
 ansible.cfg
 
-
-# Created by http://www.gitignore.io
+*.py[co]
 
 ### vim ###
 [._]*.s[a-w][a-z]
