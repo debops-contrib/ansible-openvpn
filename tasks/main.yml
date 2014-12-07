@@ -27,6 +27,20 @@
   with_items: [ '{{ openvpn_connections }}' ]
   notify: [ 'Restart OpenVPN' ]
 
+- name: Ensure PKI files are available
+  file:
+     src: '{{ item.0[item.1] }}'
+     dest: '/etc/openvpn/{{ item.0[item.1] }}'
+     owner: 'root'
+     group: 'root'
+     mode: '0600'
+  with_nested:
+     # :fixme: does not yet handle server/client defaults
+    - openvpn_connections | map("defaults_from", openvpn_default_options, openvpn_default_options_group, )| list
+    - [ 'cert', 'key', 'ca' ]
+  when: 'item.1 in item.0'
+
+
 - name: Remove OpenVPN server configurations if requested
   file:
     dest: '/etc/openvpn/{{ item.name }}.conf'
