@@ -6,6 +6,7 @@ openvpn_dh_param_size: 4096
 
 openvpn_generate_dh_param_file: True
 
+openvpn_default_options_group: {}
 openvpn_default_options:
   user: nobody
   group: nobody
@@ -22,11 +23,14 @@ openvpn_default_options:
   proto: udp # this is the default anyway, but having the defined
              # eases check
 
+
+openvpn_default_client_options_group: {}
 openvpn_default_client_options:
   ns-cert-type: server
   resolv-retry: infinite
   nobind: True
 
+openvpn_default_server_options_group: {}
 openvpn_default_server_options:
   ns-cert-type: client
   max-clients: 5
