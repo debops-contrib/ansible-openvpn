@@ -1,0 +1,55 @@
+---
+
+dependencies:
+#  - role: debops.ferm
+#    ferm_input_list:
+
+#      - type: 'dport_accept'
+#        dport: [ 'http', 'https' ]
+#        saddr: '{{ nginx_allow + nginx_group_allow + nginx_host_allow }}'
+#        accept_any: True
+#        filename: 'openvpn_dependency_accept'
+#        weight: '20'
+
+galaxy_info:
+  author: 'Hartmut Goebel'
+  description: 'Install and manage OpenVPN'
+  company: 'DebOps'
+  license: 'GNU General Public License v3'
+  min_ansible_version: '1.7.0'
+  platforms:
+  - name: Ubuntu
+    versions:
+    - precise
+    - quantal
+    - raring
+    - saucy
+    - trusty
+  - name: Debian
+    versions:
+    - wheezy
+    - jessie
+  categories:
+  - networking
+
+ansigenome_info:
+  github_url: "https://github.com/debops/ansible-openvpn"
+  git_branch: "master"
+  #galaxy_id: "1580"
+
+  beta: True
+  travis: True
+
+  license_url: 'https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)'
+
+  authors:
+    - name:  'Hartmut Goebel'
+      url: 'http://www.crazy-compilers.com/'
+      email: 'h.goebel@crazy-compilers.com'
+
+  synopsis: |
+    [OpenVPN](http://openvpn.org/) is a a secure TCP/UDP tunneling daemon.
+
+    `debops.openvpn` role can be used to install and manage `OpenVPN`
+    configurations for multiple connections on both client- and
+    server-side.

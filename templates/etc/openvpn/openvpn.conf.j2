@@ -1,0 +1,54 @@
+# This file is managed by Ansible, all changes will be lost
+{% set _cfg = dict() %}
+{% set _ = _cfg.update(openvpn_default_options) %}
+{% if 'server' in item or 'server-bridge' in item or 'tcp-server' in item %}
+  {%- set _ = _cfg.update(openvpn_default_server_options) %}
+{%- else %}
+  {%- set _ = _cfg.update(openvpn_default_client_options) %}
+{%- endif %}
+{% set _ = _cfg.update(item) %}
+{% set __boolen_values__ = ['tun-ipv6', ] %}
+{% set __plural_keys__ = ['connections', 'routes', 'remotes'] %}
+
+{% macro dumpdict(values, format='%s %s') %}
+{%   for key, value in values|dictsort %}
+{{     format | format(key, value) }}
+{%   endfor %}
+{% endmacro %}
+{% macro dumplist(key, values, format='%s %s') %}
+{%    for v in values %}
+{{      format | format(key, v) }}
+{%    endfor %}
+{% endmacro %}
+
+{% for key, value in _cfg|dictsort %}
+ {%- if key in __boolen_values__ %}
+   {%- set value = (value|lower != 'false') %}
+ {%- elif key in __plural_keys__ %}
+   {%- set key = key[:-1] %}
+ {%- endif %}
+ {%- if key == 'name' -%}
+   {{ '#%s %s' | format(key, value) }}
+ {%- elif value == True -%}
+   {{ '%s' | format(key) }}
+ {%- elif value == False -%}
+   {{ '#%s' | format(key) }}
+ {%- elif value is mapping %}
+   {{- dumpdict(value, format=key+' %s %s') -}}
+ {%- elif value is sequence and not value is string %}
+   {%- if key == 'connection' -%}
+     {%- for value in value -%}
+<connection>
+{{ dumpdict(value) -}}
+</connection>
+{%       endfor -%}
+   {%- elif key == 'push' %}
+     {{- dumplist(key, value, format='%s "%s"') -}}
+   {%- else -%}
+     {{ dumplist(key, value) -}}
+   {%- endif %}
+ {%- else -%}
+   {{ '%s %s' | format(key, value) }}
+ {%- endif %}
+
+{% endfor %}

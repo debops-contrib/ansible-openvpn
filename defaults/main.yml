@@ -1,0 +1,34 @@
+---
+
+# Using a Diffie-Hellman parameter size below 2048 is to be
+# considered insecure.
+openvpn_dh_param_size: 4096
+
+openvpn_generate_dh_param_file: True
+
+openvpn_default_options:
+  user: nobody
+  group: nobody
+  persist-key: True  # required if user is not root
+  persist-tun: True  # required if user is not root
+  remote-random-hostname: True
+  tun-ipv6: '{{ ansible_all_ipv6_addresses | bool }}'  # only valid if dev=tun
+  verb: 3
+  mute: 5
+  ca: ca.crt
+  dh: 'dh{{openvpn_dh_param_size}}.pem'
+  cipher: AES-256-CBC
+  comp-lzo: True
+  proto: udp # this is the default anyway, but having the defined
+             # eases check
+
+openvpn_default_client_options:
+  ns-cert-type: server
+  resolv-retry: infinite
+  nobind: True
+
+openvpn_default_server_options:
+  ns-cert-type: client
+  max-clients: 5
+
+openvpn_connections: []
