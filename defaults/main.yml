@@ -6,6 +6,13 @@ openvpn_dh_param_size: 4096
 
 openvpn_generate_dh_param_file: True
 
+# Precedence of parameters (lowest o highest):
+# - default options
+# - default options group
+# - default (server|client) options
+# - default (server|client) options group
+# - item options (from openvpn_connections)
+
 openvpn_default_options_group: {}
 openvpn_default_options:
   user: nobody
