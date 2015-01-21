@@ -1,15 +1,4 @@
 # This file is managed by Ansible, all changes will be lost
-{% set _cfg = dict() %}
-{% set _ = _cfg.update(openvpn_default_options) %}
-{% set _ = _cfg.update(openvpn_default_options_group) %}
-{% if 'server' in item or 'server-bridge' in item or 'tcp-server' in item %}
-  {%- set _ = _cfg.update(openvpn_default_server_options) %}
-  {%- set _ = _cfg.update(openvpn_default_server_options_group) %}
-{%- else %}
-  {%- set _ = _cfg.update(openvpn_default_client_options) %}
-  {%- set _ = _cfg.update(openvpn_default_client_options_group) %}
-{%- endif %}
-{% set _ = _cfg.update(item) %}
 {% set __boolen_values__ = ['tun-ipv6', ] %}
 {% set __plural_keys__ = ['connections', 'routes', 'remotes'] %}
 
@@ -24,7 +13,7 @@
 {%    endfor %}
 {% endmacro %}
 
-{% for key, value in _cfg|dictsort %}
+{% for key, value in item|dictsort %}
  {%- if key in __boolen_values__ %}
    {%- set value = (value|lower != 'false') %}
  {%- elif key in __plural_keys__ %}

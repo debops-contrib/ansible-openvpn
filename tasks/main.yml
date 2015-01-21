@@ -16,6 +16,11 @@
   file:
     name: /etc/openvpn/dh{{openvpn_dh_param_size}}.pem
     mode: 0644
+- name: Fill default values for connection definitions
+  set_fact:
+    openvpn_connections: "{{ lookup('template', './update-connection-defaults.j2') }}"
+
+#- debug: var=openvpn_connections
 
 - name: Generate OpenVPN configurations
   template:
