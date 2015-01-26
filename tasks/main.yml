@@ -32,6 +32,15 @@
   notify: [ 'Restart OpenVPN' ]
   when: item.name|default and item.delete|default
 
+
+- name: Ensure directory of ifconfig-pool-persist file exists
+  file:
+    dest: /var/lib/openvpn
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
 - name: Ensure OpenVPN service is enabled
   service:
     name: openvpn
