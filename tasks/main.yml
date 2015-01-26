@@ -15,7 +15,7 @@
 - name: Generate OpenVPN configurations
   template:
     src: 'etc/openvpn/openvpn.conf.j2'
-    dest: '/etc/openvpn/{{ item.name }}.conf'
+    dest: '/etc/openvpn/{{ item.name|replace(" ", "_") }}.conf'
     owner: 'root'
     group: 'root'
     mode: '0600'
