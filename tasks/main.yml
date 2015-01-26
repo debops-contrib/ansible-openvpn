@@ -17,7 +17,7 @@
     src: 'etc/openvpn/openvpn.conf.j2'
     dest: '/etc/openvpn/{{ item.name|replace(" ", "_") }}.conf'
     owner: 'root'
-    group: 'root'
+    group: 'adm'
     mode: '0600'
   with_items: [ '{{ openvpn_connections }}' ]
   notify: [ 'Restart OpenVPN' ]
