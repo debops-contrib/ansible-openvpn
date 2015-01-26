@@ -20,6 +20,7 @@
     group: 'adm'
     mode: '0600'
   with_items: [ '{{ openvpn_connections }}' ]
+  when: item.name|default and not (item.delete|default)
   notify: [ 'Restart OpenVPN' ]
 
 
