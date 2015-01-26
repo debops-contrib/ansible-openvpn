@@ -6,16 +6,6 @@
     state: present
     install_recommends: False
 
-- name: Generate Diffie Hellman parameters
-  command: openssl dhparam -text -out dh{{openvpn_dh_param_size}}.pem {{openvpn_dh_param_size}}
-  args:
-    chdir: /etc/openvpn/
-    creates: dh{{openvpn_dh_param_size}}.pem
-
-- name: Ensure filemode for Diffie Hellman parameters file
-  file:
-    name: /etc/openvpn/dh{{openvpn_dh_param_size}}.pem
-    mode: 0644
 - name: Fill default values for connection definitions
   set_fact:
     openvpn_connections: "{{ lookup('template', './update-connection-defaults.j2') }}"
@@ -31,19 +21,6 @@
     mode: '0600'
   with_items: [ '{{ openvpn_connections }}' ]
   notify: [ 'Restart OpenVPN' ]
-
-- name: Ensure PKI files are available
-  file:
-     src: '{{ item.0[item.1] }}'
-     dest: '/etc/openvpn/{{ item.0[item.1] }}'
-     owner: 'root'
-     group: 'root'
-     mode: '0600'
-  with_nested:
-     # :fixme: does not yet handle server/client defaults
-    - openvpn_connections | map("defaults_from", openvpn_default_options, openvpn_default_options_group, )| list
-    - [ 'cert', 'key', 'ca' ]
-  when: 'item.1 in item.0'
 
 
 - name: Remove OpenVPN server configurations if requested
