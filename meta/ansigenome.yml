@@ -1,0 +1,23 @@
+---
+ansigenome_info:
+  github_url: https://github.com/debops/ansible-openvpn
+  git_branch: master
+  #galaxy_id: 1580
+
+  beta: True
+  travis: True
+
+  license_url: https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)
+
+  authors:
+    - name:   Hartmut Goebel
+      url:    http://www.crazy-compilers.com/
+      email:  h.goebel@crazy-compilers.com
+      github: htgoebel
+
+  synopsis: |
+    [OpenVPN](http://openvpn.org/) is a a secure TCP/UDP tunneling daemon.
+
+    *debops.openvpn* role can be used to install and manage *OpenVPN*
+    configurations for multiple connections on both client- and
+    server-side.
