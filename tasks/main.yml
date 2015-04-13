@@ -8,9 +8,23 @@
 
 - name: Fill default values for connection definitions
   set_fact:
-    openvpn_connections: "{{ lookup('template', './update-connection-defaults.j2') }}"
-
-#- debug: var=openvpn_connections
+    #openvpn_connections: "{{ lookup('template', './update-connection-defaults.j2') }}"
+    openvpn_connections: |
+      {%- for item in openvpn_connections %}
+      {% set _cfg = dict() %}
+      {%- set _ = _cfg.update(openvpn_default_options) %}
+      {%- set _ = _cfg.update(openvpn_default_options_group) %}
+      {%- if 'server' in item or 'server-bridge' in item or 'tcp-server' in item %}
+      {%-   set _ = _cfg.update(openvpn_default_server_options) %}
+      {%-   set _ = _cfg.update(openvpn_default_server_options_group) %}
+      {%- else %}
+      {%-   set _ = _cfg.update(openvpn_default_client_options) %}
+      {%-   set _ = _cfg.update(openvpn_default_client_options_group) %}
+      {%- endif %}
+      {%- set _ = _cfg.update(item) %}
+      {%- set _ = item.update(_cfg) %}
+      {%- endfor %}
+      {{- openvpn_connections }}
 
 - name: Generate OpenVPN configurations
   template:
