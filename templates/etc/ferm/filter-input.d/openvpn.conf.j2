@@ -1,0 +1,88 @@
+# This file is managed by Ansible, all changes will be lost
+
+{% set __boolen_values__ = ['tun-ipv6', ] %}
+{% set __plural_keys__ = ['connections', 'routes', 'remotes'] %}
+{% set _rules = [] %}
+
+{%- macro print_rule(proto, laddr, lport, raddr, rport) -%}
+{%-   set _ = _rules.append([proto, laddr, lport, raddr, rport]) %}
+protocol {{proto}}
+{%- if laddr != 'any' %} saddr {{laddr}} {%- endif %}
+{%- if lport != 'any' %} sport {{lport}} {%- endif %}
+{%- if raddr != 'any' %} daddr {{raddr}} {%- endif %}
+{%- if rport != 'any' %} dport {{rport}} {%- endif %}
+ ACCEPT ;
+{% endmacro -%}
+
+
+{%- macro handle_remote(remote, proto, laddr, lport, raddr, rport) -%}
+{%-   set raddr = remote.split()[0] -%}
+{%-   set rport = remote.split()[1] | default(rport) -%}
+{%-   set proto = remote.split()[2] | default(proto) -%}
+{{   print_rule(proto, laddr, lport, raddr, rport) }}
+{%- endmacro -%}
+
+{%- macro handle_connection_definition(values, proto, laddr, lport, raddr, rport) -%}
+{%    set remotes = (values['remote'] | default([])) %}
+{%-   set remotes = [remotes] if remotes is string else remotes %}
+{%-   if 'http-proxy' in values -%}
+{%-      set proto = 'tcp' -%}
+{%-      set raddr = values['http-proxy'].split()[0] -%}
+{%-      set rport = values['http-proxy'].split()[1] -%}
+{%-      set lport = 'any' if not 'bind' in values else lport -%}
+{%-      set remotes = [] -%}
+{%-   elif 'socks-proxy' in values -%}
+{%-      set proto = 'tcp' -%}
+{%-      set raddr = values['socks-proxy'].split()[0] -%}
+{%-      set rport = values['socks-proxy'].split()[1] | default('1080') -%}
+{%-      set lport = 'any' if not 'bind' in values else lport -%}
+{%-      set remotes = [] -%}
+{%-   elif proto == 'tcp-client': -%}
+{%-      set lport = 'any' if not 'bind' in values else lport -%}
+{%-   elif proto == 'tcp-server': -%}
+{%-      set proto = 'tcp' -%}
+{%-   endif   %}
+{#    if remotes are defined, do not issue a "normal" connection #}
+{%-   if not remotes -%}
+{{      print_rule(proto, laddr, lport, raddr, rport) }}
+{%-   endif %}
+{%-   for remote in remotes %}
+{{      handle_remote(remote, proto, laddr, lport, raddr, rport) }}
+{%-   endfor %}
+{%- endmacro -%}
+
+{%- macro getdest(values, format='%s %s') %}
+{%-   set laddr = values['local'] | default('any') %}
+{%-   set lport = values['lport'] | default(values['port']) | default('1194') %}
+{%-   set rport = values['rport'] | default(values['port']) | default('1194') %}
+{%-   set raddr = 'any' %}
+{%-   set proto = 'udp' %}
+{#    handle main config #}
+{{    handle_connection_definition(values, proto, laddr, lport, raddr, rport) }}
+{#    handle connections #}
+{%-   for connection in (values['connection'] | default([])): %}
+{{      handle_connection_definition(connection, proto, laddr, lport, raddr, rport) }}
+{%-   endfor %}
+{%- endmacro -%}
+
+{#
+The following OpenVPN options may be used inside of a <connection>
+block and are relevant for the firewall conviguration:
+
+bind (default unless any of proto tcp-client, http-proxy or socks-proxy)
+nobind
+float (default if no `remote` is given),
+http-proxy, socks-proxy
+local
+port
+lport (port number for bind – only relevant if `bind`)
+rport
+proto, remote
+#}
+{# proto  udp, tcp-client, tcp-server #}
+{%- for connection in openvpn_connections -%}
+{%-   if not (connection.delete|default(False)) -%}
+# {{ connection.name }}
+{{     getdest(connection) }}
+{%   endif -%}
+{%- endfor -%}

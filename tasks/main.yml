@@ -60,3 +60,13 @@
     name: openvpn
     enabled: True
 
+- name: Save OpenVPN firewall filters
+  # directory is already created by debops.ferm
+  template:
+    src: 'etc/ferm/filter-input.d/openvpn.conf.j2'
+    dest: '/etc/ferm/filter-input.d/openvpn.conf'
+    owner: 'root'
+    group: 'adm'
+    mode: '0644'
+  notify: Restart ferm
+
